@@ -1,0 +1,199 @@
+﻿@model HomePageDto
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+
+<div class="sidebar">
+    <a href="#" onclick="showSection('dashboard')" class="active" id="dashboardLink">
+        <i class="fas fa-chart-line"></i> Dashboard
+    </a>
+    <a href="#" onclick="showSection('books')" id="booksLink">
+        <i class="fas fa-book-open"></i> Books
+    </a>
+    <a href="#" onclick="showSection('members')" id="membersLink">
+        <i class="fas fa-id-badge"></i> Members
+    </a>
+    <a href="#" onclick="showSection('accounting')" id="accountingLink">
+        <i class="fas fa-file-invoice-dollar"></i> Accounting
+    </a>
+    <a href="#" onclick="showSection('clearance')" id="clearanceLink">
+        <i class="fas fa-clipboard-check"></i> Clearance
+    </a>
+
+</div>
+<div class="top-header d-flex justify-content-between align-items-center px-4 py-2 shadow-sm">
+    <h5 class="mb-0">📘 Library Soft</h5>
+    <a href="/Auth/logout" class="btn btn-outline-danger btn-sm">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</div>
+
+<div class="content">
+    <div id="books">
+        <div class="d-flex justify-content-between mb-3">
+            <h4>Book List</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">Add Book</button>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Category</th>
+                <th>Copies</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var book in Model.BookDto)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.Author</td>
+                    <td>@book.ISBN</td>
+                    <td>@book.Category</td>
+                    <td>@book.AvailableCopies / @book.TotalCopies</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editBookModal" data-id="@book.Id">Update</button>
+                        <form asp-controller="Book" asp-action="DeleteBook" asp-route-id="@book.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div id="members" style="display:none">
+        <div class="d-flex justify-content-between mb-3">
+            <h4>Member List</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add Member</button>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Joined</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var member in Model.MembersDto)
+            {
+                <tr>
+                    <td>@member.FullName</td>
+                    <td>@member.Email</td>
+                    <td>@member.MembershipType</td>
+                    <td>@member.MembershipStartDate</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editBookModal" data-id="@member.Id">Update</button>
+                        <form asp-action="DeleteMember" asp-controller="Member" asp-route-id="@member.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modals remain unchanged -->
+<!-- Add Book Modal -->
+<div class="modal fade" id="addBookModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form asp-action="AddBook" asp-controller="Book" method="post" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input name="Title" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Author</label>
+                    <input name="Author" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">ISBN</label>
+                    <input name="ISBN" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <input name="Category" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Total Copies</label>
+                    <input type="number" name="TotalCopies" class="form-control" required min="1" />
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Add Member Modal -->
+<div class="modal fade" id="addMemberModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form asp-action="AddMember" asp-controller="Member" method="post" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input name="FullName" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input name="Email" type="email" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contact Number</label>
+                    <input name="ContactNumber" type="tel" pattern="^\d{7,15}$" 
+                           title="Enter a valid contact number (7-15 digits)" 
+                           class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Membership Type</label>
+                    <select name="MembershipType" class="form-select" required>
+                        <option value="">-- Select Type --</option>
+                        <option>Student</option>
+                        <option>Staff</option>
+                        <option>Guest</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Start Date</label>
+                    <input name="MembershipStartDate" type="date" class="form-control" required />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="~/css/styles.css" type="text/css" rel="stylesheet"/>
+<script src="~/js/scripts.js"></script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

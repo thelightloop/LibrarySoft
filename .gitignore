@@ -1,0 +1,63 @@
+## Build results
+bin/
+obj/
+out/
+[Bb]uild/
+[Ll]og/
+
+## User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.vspscc
+*.vssscc
+
+## Rider project files
+.idea/
+*.sln.iml
+
+## Visual Studio files
+.vs/
+
+## ASP.NET
+appsettings.Development.json
+appsettings.*.json
+secrets.json
+
+## DotNet Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## NuGet
+*.nupkg
+.nuget/
+packages/
+*.snupkg
+
+## Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+## Backup & logs
+*.bak
+*.log
+
+## Others
+*.DS_Store
+*.env
+*.swp
+*.tmp
+
+# OS generated
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Publish
+publish/
+wwwroot/lib/
+wwwroot/dist/
