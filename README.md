@@ -1,0 +1,2 @@
+# LibrarySoft
+for basecode purpose
