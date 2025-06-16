@@ -3,6 +3,14 @@
     ViewData["Title"] = "Dashboard";
 }
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
 <div class="sidebar">
     <a href="#" onclick="showSection('dashboard')" class="active" id="dashboardLink">
@@ -30,6 +38,43 @@
 </div>
 
 <div class="content">
+    <div id="dashboard">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Assign Book to Member</h5>
+            </div>
+            <div class="card-body">
+                <form asp-controller="BookIssue" asp-action="AssignBook" method="post">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-5">
+                            <label class="form-label">Select Book</label>
+                            <select name="BookId" class="form-select" required>
+                                <option value="">-- Select Book --</option>
+                                @foreach (var book in Model.BookDto.Where(b => b.AvailableCopies > 0))
+                                {
+                                    <option value="@book.Id">@book.Title (@book.AvailableCopies left)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Select Member</label>
+                            <select name="MemberId" class="form-select" required>
+                                <option value="">-- Select Member --</option>
+                                @foreach (var member in Model.MembersDto)
+                                {
+                                    <option value="@member.Id">@member.FullName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100">Assign</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="books">
         <div class="d-flex justify-content-between mb-3">
             <h4>Book List</h4>
@@ -42,7 +87,8 @@
                 <th>Author</th>
                 <th>ISBN</th>
                 <th>Category</th>
-                <th>Copies</th>
+                <th>Available</th>
+                <th>Total</th>
                 <th>Action</th>
             </tr>
             </thead>
@@ -54,9 +100,11 @@
                     <td>@book.Author</td>
                     <td>@book.ISBN</td>
                     <td>@book.Category</td>
-                    <td>@book.AvailableCopies / @book.TotalCopies</td>
+                    <td>@book.AvailableCopies </td>
+                    <td>@book.TotalCopies</td>
                     <td>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editBookModal" data-id="@book.Id">Update</button>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editBookModal" data-id="@book.Id">Edit</button>
+                        
                         <form asp-controller="Book" asp-action="DeleteBook" asp-route-id="@book.Id" method="post" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
                         </form>
@@ -78,6 +126,7 @@
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Type</th>
+                <th>Mobile</th>
                 <th>Joined</th>
                 <th>Action</th>
             </tr>
@@ -89,9 +138,14 @@
                     <td>@member.FullName</td>
                     <td>@member.Email</td>
                     <td>@member.MembershipType</td>
+                    <td>@member.ContactNumber</td>
                     <td>@member.MembershipStartDate</td>
                     <td>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editBookModal" data-id="@member.Id">Update</button>
+                        
+                        <!-- Inside member row -->
+                        <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="@member.Id">Edit</button>
+
+                        
                         <form asp-action="DeleteMember" asp-controller="Member" asp-route-id="@member.Id" method="post" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                         </form>
@@ -115,28 +169,110 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label">Title</label>
-                    <input name="Title" class="form-control" required />
+                    <input name="Title" class="form-control" required/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Author</label>
-                    <input name="Author" class="form-control" required />
+                    <input name="Author" class="form-control" required/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">ISBN</label>
-                    <input name="ISBN" class="form-control" required />
+                    <input name="ISBN" class="form-control" required/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Category</label>
-                    <input name="Category" class="form-control" required />
+                    <input name="Category" class="form-control" required/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Total Copies</label>
-                    <input type="number" name="TotalCopies" class="form-control" required min="1" />
+                    <input type="number" name="TotalCopies" class="form-control" required min="1"/>
                 </div>
-                
+
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Edit Book Modal -->
+<div class="modal fade" id="editBookModal" tabindex="-1" aria-labelledby="editBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="updatebook" asp-controller="Book" method="post" class="modal-content">
+            <input type="hidden" name="Id"/>
+            <div class="modal-header">
+                <h5 class="modal-title" id="editBookModalLabel">Update Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input name="Title" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Author</label>
+                    <input name="Author" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">ISBN</label>
+                    <input name="ISBN" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <input name="Category" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Total Copies</label>
+                    <input type="number" name="TotalCopies" class="form-control" required min="1"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Member Modal -->
+<div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="UpdateMember" asp-controller="Member" method="post" class="modal-content">
+            <input type="hidden" name="Id"/>
+            <div class="modal-header">
+                <h5 class="modal-title" id="editMemberModalLabel">Update Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input name="FullName" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input name="Email" type="email" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contact Number</label>
+                    <input name="ContactNumber" type="tel" pattern="^\d{7,15}$"
+                           title="Enter a valid contact number (7-15 digits)"
+                           class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Membership Type</label>
+                    <select name="MembershipType" class="form-select" required>
+                        <option value="">-- Select Type --</option>
+                        <option>Student</option>
+                        <option>Staff</option>
+                        <option>Guest</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Start Date</label>
+                    <input name="MembershipStartDate" type="date" class="form-control" required/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success">Update</button>
             </div>
         </form>
     </div>
@@ -154,17 +290,17 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label">Full Name</label>
-                    <input name="FullName" class="form-control" required />
+                    <input name="FullName" class="form-control" required/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input name="Email" type="email" class="form-control" required />
+                    <input name="Email" type="email" class="form-control" required/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Contact Number</label>
-                    <input name="ContactNumber" type="tel" pattern="^\d{7,15}$" 
-                           title="Enter a valid contact number (7-15 digits)" 
-                           class="form-control" required />
+                    <input name="ContactNumber" type="tel" pattern="^\d{7,15}$"
+                           title="Enter a valid contact number (7-15 digits)"
+                           class="form-control" required/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Membership Type</label>
@@ -177,7 +313,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Start Date</label>
-                    <input name="MembershipStartDate" type="date" class="form-control" required />
+                    <input name="MembershipStartDate" type="date" class="form-control" required/>
                 </div>
             </div>
             <div class="modal-footer">
@@ -194,6 +330,15 @@
 <link href="~/css/styles.css" type="text/css" rel="stylesheet"/>
 <script src="~/js/scripts.js"></script>
 
+
+
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+     <script>
+            window.appData = {
+                books: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookDto)),
+                members: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MembersDto))
+            };
+        </script>
+        <script src="~/js/scripts.js"></script>
+    <partial name="_ValidationScriptsPartial"/>
 }

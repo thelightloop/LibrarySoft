@@ -6,10 +6,10 @@ namespace Library.Common.DTO
     {
         public int Id { get; set; }
 
-        public int MemberId { get; set; }
+        public string MemberId { get; set; }
         public Member Member { get; set; }
 
-        public int BookId { get; set; }
+        public string BookId { get; set; }
         public Book Book { get; set; }
 
         public DateTime IssueDate { get; set; }

@@ -24,8 +24,24 @@ namespace Library.Controllers
         public async Task<IActionResult> DeleteBook(string id)
         {
             await bookService.DeleteBookAsync(id);
-            
+
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost("UpdateBook")]
+        public async Task<IActionResult> UpdateBook(BookDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Assuming you have an UpdateMemberAsync method in your service
+            await bookService.UpdateBookAsync(dto);
+            return RedirectToAction("Index", "Home");
+
+            // If ModelState is invalid, you can handle it by reloading the page with errors
+            //
         }
     }
 }
