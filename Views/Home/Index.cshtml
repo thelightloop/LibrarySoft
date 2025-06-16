@@ -1,4 +1,5 @@
-﻿@model HomePageDto
+﻿@using System.Text.Json
+@model HomePageDto
 @{
     ViewData["Title"] = "Dashboard";
 }
@@ -76,10 +77,14 @@
     </div>
 
     <div id="books">
-        <div class="d-flex justify-content-between mb-3">
-            <h4>Book List</h4>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4>Book List</h4>
+                <input type="text" id="bookSearchInput" class="form-control mt-2" placeholder="Search"/>
+            </div>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">Add Book</button>
         </div>
+
         <table class="table table-bordered table-striped">
             <thead class="table-light">
             <tr>
@@ -104,7 +109,7 @@
                     <td>@book.TotalCopies</td>
                     <td>
                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editBookModal" data-id="@book.Id">Edit</button>
-                        
+
                         <form asp-controller="Book" asp-action="DeleteBook" asp-route-id="@book.Id" method="post" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
                         </form>
@@ -116,10 +121,14 @@
     </div>
 
     <div id="members" style="display:none">
-        <div class="d-flex justify-content-between mb-3">
-            <h4>Member List</h4>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4>Member List</h4>
+                <input type="text" id="memberSearchInput" class="form-control mt-2" placeholder="Search"/>
+            </div>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add Member</button>
         </div>
+
         <table class="table table-bordered table-striped">
             <thead class="table-light">
             <tr>
@@ -141,11 +150,11 @@
                     <td>@member.ContactNumber</td>
                     <td>@member.MembershipStartDate</td>
                     <td>
-                        
+
                         <!-- Inside member row -->
                         <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="@member.Id">Edit</button>
 
-                        
+
                         <form asp-action="DeleteMember" asp-controller="Member" asp-route-id="@member.Id" method="post" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                         </form>
@@ -331,14 +340,13 @@
 <script src="~/js/scripts.js"></script>
 
 
-
 @section Scripts {
-     <script>
+    <script>
             window.appData = {
-                books: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookDto)),
-                members: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MembersDto))
+                books: @Html.Raw(JsonSerializer.Serialize(Model.BookDto)),
+                members: @Html.Raw(JsonSerializer.Serialize(Model.MembersDto))
             };
         </script>
-        <script src="~/js/scripts.js"></script>
+    <script src="~/js/scripts.js"></script>
     <partial name="_ValidationScriptsPartial"/>
 }

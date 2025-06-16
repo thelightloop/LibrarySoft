@@ -91,3 +91,30 @@ function showSection(sectionId) {
         }
     });
 }
+
+
+    function filterTable(inputId, tableSelector) {
+    const input = document.getElementById(inputId);
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll(`${tableSelector} tbody tr`);
+
+    rows.forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(filter) ? '' : 'none';
+});
+}
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const bookInput = document.getElementById('bookSearchInput');
+    const memberInput = document.getElementById('memberSearchInput');
+
+    if (bookInput) {
+    bookInput.addEventListener('input', () => filterTable('bookSearchInput', '#books table'));
+}
+
+    if (memberInput) {
+    memberInput.addEventListener('input', () => filterTable('memberSearchInput', '#members table'));
+}
+});
+
+
