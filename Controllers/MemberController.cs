@@ -1,9 +1,11 @@
 ﻿using Library.Common.DTO;
 using Library.Services.MemberManagement;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     public class MemberController(IMemberService memberService) : Controller
     {

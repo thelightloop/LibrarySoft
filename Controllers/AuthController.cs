@@ -1,34 +1,70 @@
 ﻿using Library.Common.ApiResponse;
 using Library.Common.DTO;
 using Library.Services.Auth;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Library.Controllers
 {
+    [AllowAnonymous]
     [Route("[controller]")]
     public class AuthController(IAuthService authService) : Controller
     {
-
-        // GET: /Auth/Login
         [HttpGet("login")]
         public IActionResult Login()
         {
-            return View(); // Renders Login.cshtml
+            if (User.Identity!.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View();
+        }
+
+        [HttpGet("register")]
+        public IActionResult Register()
+        {
+            if (User.Identity!.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View();
         }
 
         [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
-            // Optional: remove your custom session/cookie logic here
+            // 1. Sign out cookie authentication
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            return RedirectToAction("login", "Auth");
+            // 2. Clear session
+            HttpContext.Session.Clear();
+
+            // 3. Remove all cookies explicitly (including auth cookie)
+            foreach (string cookie in HttpContext.Request.Cookies.Keys)
+            {
+                HttpContext.Response.Cookies.Delete(cookie);
+            }
+
+            // 4. Clear current user principal
+            HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity());
+
+            // 5. Add headers to prevent caching (optional but recommended)
+            HttpContext.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+            HttpContext.Response.Headers.Pragma = "no-cache";
+            HttpContext.Response.Headers.Expires = "0";
+
+            // 6. Redirect to login page with a query param to avoid cached pages on back button
+            return Redirect("/auth/login?loggedOut=true");
         }
 
-        // POST: /Auth/Login
+
         [HttpPost("login")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
             if (!ModelState.IsValid)
@@ -37,26 +73,19 @@ namespace Library.Controllers
                 return View(loginDto);
             }
 
-            var response = await authService.LoginAsync(loginDto);
-            if (!response.Success)
+            ApiResponse<string> response = await authService.LoginAsync(loginDto);
+
+            if (response.Success)
             {
-                ViewBag.Error = response.Message;
-                return View(loginDto);
+                return RedirectToAction("Index", "Home");
             }
 
-            // TODO: Set session or auth cookie as needed
-            return RedirectToAction("Index", "Home");
+            ViewBag.Error = response.Message;
+            return View(loginDto);
         }
 
-        // GET: /Auth/Register
-        [HttpGet("register")]
-        public IActionResult Register()
-        {
-            return View(); // Renders Register.cshtml
-        }
-
-        // POST: /Auth/Register
         [HttpPost("register")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
             if (!ModelState.IsValid)
@@ -68,12 +97,11 @@ namespace Library.Controllers
             ApiResponse<string> response = await authService.RegisterAsync(registerDto);
             if (response.Success)
             {
-                return RedirectToAction("index","Home");
+                return RedirectToAction("Index", "Home");
             }
 
             ViewBag.Error = response.Message;
             return View(registerDto);
-
         }
     }
 }

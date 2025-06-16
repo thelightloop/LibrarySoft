@@ -1,9 +1,11 @@
 ﻿using Library.Common.DTO;
 using Library.Services.IssueBook;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     public class BookController(IBookIssueService bookService) : Controller
     {
@@ -22,6 +24,7 @@ namespace Library.Controllers
         public async Task<IActionResult> DeleteBook(string id)
         {
             await bookService.DeleteBookAsync(id);
+            
             return RedirectToAction("Index", "Home");
         }
     }
