@@ -24,7 +24,7 @@ namespace Library.Database
                 entity.HasKey(b => b.Id);
                 entity.Property(b => b.Title).IsRequired();
                 entity.Property(b => b.Author).IsRequired();
-                entity.Property(b => b.ISBN).IsRequired().HasMaxLength(13);
+                entity.Property(b => b.ISBN).IsRequired().HasMaxLength(17);
             });
 
             modelBuilder.Entity<Member>(entity =>
