@@ -24,11 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Constants\" />
-    <Folder Include="Common\Enums\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EditorConfigFiles Remove="C:\Users\prakash.dhakal\source\repos\Library\.editorconfig" />
   </ItemGroup>
 

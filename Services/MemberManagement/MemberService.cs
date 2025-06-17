@@ -28,21 +28,21 @@ namespace Library.Services.MemberManagement
             await context.Members.AddAsync(member);
             await context.SaveChangesAsync();
 
-            return ApiResponse<string>.SuccessResponse(dto.Id, "✅ Member added successfully.");
+            return ApiResponse<string>.SuccessResponse(dto.Id, " Member added successfully.");
         }
 
         public async Task<ApiResponse<bool>> UpdateMemberAsync(string id, MemberDto dto)
         {
             var member = await context.Members.FindAsync(id);
             if (member is null)
-                return ApiResponse<bool>.Fail("❌ Member not found.");
+                return ApiResponse<bool>.Fail(" Member not found.");
 
             member.FullName = dto.FullName;
             member.Email = dto.Email;
             member.ContactNumber = dto.ContactNumber;
 
             await context.SaveChangesAsync();
-            return ApiResponse<bool>.SuccessResponse(true, "✅ Member updated successfully.");
+            return ApiResponse<bool>.SuccessResponse(true, " Member updated successfully.");
         }
 
         public async Task<ApiResponse<IEnumerable<MemberDto>>> GetAllMembersAsync()
@@ -58,38 +58,37 @@ namespace Library.Services.MemberManagement
                     MembershipStartDate = m.MembershipStartDate
                 }).ToListAsync();
 
-            return ApiResponse<IEnumerable<MemberDto>>.SuccessResponse(members, "✅ Members fetched successfully.");
+            return ApiResponse<IEnumerable<MemberDto>>.SuccessResponse(members, " Members fetched successfully.");
         }
 
         public async Task<ApiResponse<MemberDto>> GetByIdAsync(string id)
         {
             var member = await context.Members.FindAsync(id);
             if (member is null)
-                return ApiResponse<MemberDto>.Fail("❌ Member not found.");
+                return ApiResponse<MemberDto>.Fail(" Member not found.");
 
             var dto = mapper.Map<MemberDto>(member);
-            return ApiResponse<MemberDto>.SuccessResponse(dto, "✅ Member fetched successfully.");
+            return ApiResponse<MemberDto>.SuccessResponse(dto, " Member fetched successfully.");
         }
 
         public async Task<ApiResponse<bool>> DeleteAsync(string id)
         {
             var member = await context.Members.FindAsync(id);
             if (member is null)
-                return ApiResponse<bool>.Fail("❌ Member not found.");
+                return ApiResponse<bool>.Fail(" Member not found.");
 
             context.Members.Remove(member);
             await context.SaveChangesAsync();
 
-            return ApiResponse<bool>.SuccessResponse(true, "🗑️ Member deleted successfully.");
+            return ApiResponse<bool>.SuccessResponse(true, " Member deleted successfully.");
         }
 
         public async Task<ApiResponse<bool>> UpdateMemberAsync(MemberDto dto)
         {
             var member = await context.Members.FindAsync(dto.Id);
             if (member == null)
-                return ApiResponse<bool>.Fail("❌ Member not found.");
+                return ApiResponse<bool>.Fail("Member not found.");
 
-            // Update the member properties with the values from the DTO
             member.FullName = dto.FullName;
             member.Email = dto.Email;
             member.ContactNumber = dto.ContactNumber;
@@ -99,10 +98,9 @@ namespace Library.Services.MemberManagement
                 member.MembershipStartDate = dto.MembershipStartDate.Value;
             }
 
-            // Save changes
             await context.SaveChangesAsync();
 
-            return ApiResponse<bool>.SuccessResponse(true, "✅ Member updated successfully.");
+            return ApiResponse<bool>.SuccessResponse(true, " Member updated successfully.");
         }
     }
 }

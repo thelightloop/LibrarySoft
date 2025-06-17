@@ -16,6 +16,7 @@ namespace Library.Controllers
             {
                 await memberService.AddMemberAsync(dto);
             }
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -34,12 +35,9 @@ namespace Library.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Assuming you have an UpdateMemberAsync method in your service
+
             await memberService.UpdateMemberAsync(dto);
             return RedirectToAction("Index", "Home");
-
-            // If ModelState is invalid, you can handle it by reloading the page with errors
-            // For simplicity, just redirecting back to Home
         }
     }
 }

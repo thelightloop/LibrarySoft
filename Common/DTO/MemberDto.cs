@@ -27,7 +27,6 @@ namespace Library.Common.DTO
         [DataType(DataType.Date)]
         public DateTime? MembershipStartDate { get; set; }
 
-        // Optional: represents issued books, if needed
         public List<IssueBookDto> IssueBooks { get; set; } = new();
     }
 }

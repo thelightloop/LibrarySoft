@@ -38,12 +38,11 @@ namespace Library.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Assuming you have an UpdateMemberAsync method in your service
+           
             await bookService.UpdateBookAsync(dto);
             return RedirectToAction("Index", "Home");
 
-            // If ModelState is invalid, you can handle it by reloading the page with errors
-            //
+          
         }
     }
 }
