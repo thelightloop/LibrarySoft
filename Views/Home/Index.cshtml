@@ -14,14 +14,14 @@
 }
 
 <div class="sidebar">
-    <a href="#" onclick="showSection('dashboard')" class="active" id="dashboardLink">
-        <i class="fas fa-chart-line"></i> Dashboard
-    </a>
-    <a href="#" onclick="showSection('books')" id="booksLink">
+    <a href="#" onclick="showSection('books')" class="active" id="booksLink">
         <i class="fas fa-book-open"></i> Books
     </a>
-    <a href="#" onclick="showSection('members')" id="membersLink">
-        <i class="fas fa-id-badge"></i> Members
+     <a href="#" onclick="showSection('members')" id="membersLink">
+            <i class="fas fa-id-badge"></i> Members
+        </a>
+    <a href="#" onclick="showSection('dashboard')"  id="dashboardLink">
+        <i class="fas fa-chart-line"></i> BookIssuance
     </a>
     <a href="#" onclick="showSection('accounting')" id="accountingLink">
         <i class="fas fa-file-invoice-dollar"></i> Accounting
@@ -47,7 +47,7 @@
             <div class="card-body">
                 <form asp-controller="BookIssue" asp-action="AssignBook" method="post">
                     <div class="row g-3 align-items-center">
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <label class="form-label">Select Book</label>
                             <select name="BookId" class="form-select" required>
                                 <option value="">-- Select Book --</option>
@@ -57,7 +57,7 @@
                                 }
                             </select>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <label class="form-label">Select Member</label>
                             <select name="MemberId" class="form-select" required>
                                 <option value="">-- Select Member --</option>
@@ -67,14 +67,86 @@
                                 }
                             </select>
                         </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Issue Date</label>
+                            <input type="date" name="IssueDate" class="form-control" required />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" name="DueDate" class="form-control" required />
+                        </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-success w-100">Assign</button>
                         </div>
                     </div>
                 </form>
+
+            </div>
+        </div>
+    
+        <!-- New section: Assigned Books List -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Current Book Assignments</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.IssueBookDto.Any())
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Member Name</th>
+                                <th>Assigned Date</th>
+                                <th>DueDate Date</th>
+                                <th>Fine Amount</th>
+                                <th>Actions</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in Model.IssueBookDto)
+                            {
+                                <tr>
+                                    <td>@assignment.Book.Title</td>
+                                    <td>@assignment.Member.FullName</td>
+                                    <td>@assignment.IssueDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@assignment.DueDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        @if (assignment.DueDate < DateTime.UtcNow)
+                                        {
+                                            var lateDays = (DateTime.UtcNow - assignment.DueDate).Days;
+                                            <span> -Rs: @(lateDays * 1.5m)</span>
+                                        }
+                                        else
+                                        {
+                                            <span> -Rs: 0</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <!-- Example action button -->
+                                       <form asp-action="ReturnBook" asp-controller="BookIssue" method="post" style="display:inline;">
+                                           <input type="hidden" name="AssignmentId" value="@assignment.Id" />
+                                           <button type="submit" class="btn btn-sm btn-warning" 
+                                               onclick="return confirm('Are you sure you want to return this book?');">
+                                               Return
+                                           </button>
+                                       </form>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No book assignments found.</p>
+                }
             </div>
         </div>
     </div>
+
 
     <div id="books">
         <div class="d-flex justify-content-between align-items-center mb-3">

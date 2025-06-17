@@ -4,7 +4,7 @@ namespace Library.Common.DTO
 {
     public class IssueBookDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string MemberId { get; set; }
         public Member Member { get; set; }

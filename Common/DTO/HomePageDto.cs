@@ -3,6 +3,8 @@
     public class HomePageDto
     {
         public IEnumerable<BookDto> BookDto { get; set; }
+        
+        public IEnumerable<IssueBookDto> IssueBookDto { get; set; }
 
         public IEnumerable<MemberDto> MembersDto { get; set; }
 

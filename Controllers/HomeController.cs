@@ -9,15 +9,17 @@ namespace Library.Controllers
 {
     [Authorize]
     [Route("[controller]")]
-    public class HomeController(IBookIssueService bookIssueService, IMemberService memberService) : Controller
+    public class HomeController(IBookIssueService bookIssueService, IMemberService memberService ) : Controller
     {
         public async Task<IActionResult> Index()
         {
             ApiResponse<IEnumerable<BookDto>> books = await bookIssueService.GetAllBooksAsync();
 
             ApiResponse<IEnumerable<MemberDto>> members = await memberService.GetAllMembersAsync();
+            
+            ApiResponse<IEnumerable<IssueBookDto>> issuedBook = await bookIssueService.GetAllAssignmentsAsync();
 
-            HomePageDto model = new() { BookDto = books.Data, MembersDto = members.Data };
+            HomePageDto model = new() { BookDto = books.Data!, MembersDto = members.Data! , IssueBookDto = issuedBook.Data!};
 
             return View(model);
         }

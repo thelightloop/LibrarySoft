@@ -9,7 +9,8 @@ namespace Library.Services.IssueBook
         Task<ApiResponse<bool>> UpdateBookAsync(BookDto book);
         Task<ApiResponse<bool>> DeleteBookAsync(string id);
         Task<ApiResponse<IEnumerable<BookDto>>> GetAllBooksAsync();
-        Task<ApiResponse<IEnumerable<BookDto>>> SearchBooksAsync(string query);
+        Task<ApiResponse<IEnumerable<IssueBookDto>>> GetAllAssignmentsAsync();
         Task<ApiResponse<string>> AssignBookAsync(IssueBookDto dto);
+        Task<bool> ReturnBookAsync(string issueBookId);
     }
 }

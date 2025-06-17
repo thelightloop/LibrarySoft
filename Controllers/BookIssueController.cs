@@ -30,5 +30,25 @@ namespace Library.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpPost("return")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReturnBook(string AssignmentId)
+        {
+            if (string.IsNullOrEmpty(AssignmentId))
+            {
+                TempData["Error"] = "Invalid request.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var result = await bookIssueService.ReturnBookAsync(AssignmentId);
+
+            if (!result)
+                TempData["Error"] = "Issued book record not found.";
+            else
+                TempData["Success"] = "Book returned successfully.";
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }
